@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:messenger_app/components/my_logo.dart';
 import 'package:messenger_app/pages/settings.dart';
 
-import '../pages/auth_gate.dart';
+import '../pages/Main/auth_gate.dart';
 
 class DrawerC extends StatelessWidget {
   const DrawerC({super.key});
