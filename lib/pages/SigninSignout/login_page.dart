@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger_app/components/my_logo.dart';
 import 'package:messenger_app/pages/SigninSignout/login_details.dart';
-import 'package:messenger_app/pages/SigninSignout/register_page.dart';
+import 'package:messenger_app/pages/SigninSignout/register_details.dart';
 
 import '../clip_shadow.dart';
 

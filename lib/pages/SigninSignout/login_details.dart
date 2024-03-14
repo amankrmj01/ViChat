@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -37,16 +38,26 @@ class _LoginDetailsState extends State<LoginDetails> {
 
   logIN(String email, String password) async {
     if (email == "" || password == "") {
-      showDialogWithText( 'Enter the details');
+      showDialogWithText('Enter the details');
     } else {
-      UserCredential? userCredentail;
+      UserCredential? userCredential;
       try {
-        userCredentail = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: email, password: password)
-            .then((value) => Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (builder) => MainScreen())));
+        userCredential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password);
+        await FirebaseFirestore.instance
+            .collection('AllUsers')
+            .doc(userCredential.user!.uid)
+            .set({
+          'uid': userCredential.user!.uid,
+          'email': email,
+        });
       } on FirebaseAuthException catch (ex) {
         showDialogWithText('Error');
+      } finally {
+        if (Navigator.canPop(context)) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (builder) => MainScreen()));
+        }
       }
     }
   }
@@ -126,4 +137,3 @@ class _LoginDetailsState extends State<LoginDetails> {
     );
   }
 }
-

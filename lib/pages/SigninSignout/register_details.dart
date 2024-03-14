@@ -15,14 +15,14 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _username = TextEditingController();
-  final TextEditingController _gmail = TextEditingController();
+  final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _confirmPassword = TextEditingController();
 
   void register(TextEditingController username, TextEditingController password,
       TextEditingController gmail) {
     if (_username.text.isEmpty &&
-        _gmail.text.isEmpty &&
+        _email.text.isEmpty &&
         _password.text.isEmpty) {}
   }
 
@@ -30,7 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      padding: const EdgeInsets.only(left: 10,right: 10),
+      padding: const EdgeInsets.only(left: 10, right: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -45,7 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
             height: 30,
           ),
           MyTextField(
-            controller: _gmail,
+            controller: _email,
             text: 'Gmail',
             visible: false,
             icon: const Icon(Icons.alternate_email_outlined),
@@ -77,7 +77,11 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              addUserDetails(_username.text.toString(), _MyDropdownState.dropdownValue, _gmail.text.toString(), _password.text.toString());
+              addUserDetails(
+                  _username.text.toString(),
+                  _MyDropdownState.dropdownValue,
+                  _email.text.toString(),
+                  _password.text.toString());
             },
             style: ButtonStyle(
                 elevation: MaterialStateProperty.all(5),
@@ -123,32 +127,51 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   signUp(String email, String password) async {
-    UserCredential? userCredentail;
+    UserCredential? userCredential;
     try {
-      userCredentail = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password)
-          .then((value) => Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (builder) => MainScreen())));
+      userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      await FirebaseFirestore.instance
+          .collection('AllUsers')
+          .doc(userCredential.user!.uid)
+          .set({
+        'uid': userCredential.user!.uid,
+        'email': email,
+      });
     } on FirebaseAuthException catch (ex) {
-      showDialogWithText( 'Error');
+      showDialogWithText('Error');
+    } finally {
+      if (Navigator.canPop(context)) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (builder) => MainScreen()));
+      }
     }
   }
 
   Future addUserDetails(
       String username, String gender, String email, String password) async {
-    if (username == "" ||
-        gender == "" ||
-        email == "" ||
-        password == "") {
-      showDialogWithText( 'Fill all the required Details');
+    if (username == "" || gender == "" || email == "" || password == "") {
+      showDialogWithText('Fill all the required Details');
     } else {
-      signUp(email, password);
-      await FirebaseFirestore.instance.collection('Users').add({
-        'username': username,
-        'gender': gender,
-        'email': email
-      });
+      if (await checkIfEmailExists(email)) {
+        showDialogWithText('Email already exists');
+      } else {
+        signUp(email, password);
+        await FirebaseFirestore.instance.collection('Users').add(
+          {'username': username, 'gender': gender, 'email': email},
+        );
+      }
     }
+  }
+
+  Future<bool> checkIfEmailExists(String email) async {
+    final QuerySnapshot result = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+    final List<DocumentSnapshot> documents = result.docs;
+    return documents.length == 1;
   }
 
   void showDialogWithText(String text) {
@@ -169,10 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
       },
     );
   }
-
 }
-
-
 
 class MyDropdown extends StatefulWidget {
   const MyDropdown({super.key});
