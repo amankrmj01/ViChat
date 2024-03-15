@@ -207,53 +207,54 @@ class _MyDropdownState extends State<MyDropdown> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return PopupMenuButton<String>(
-      itemBuilder: (BuildContext context) {
-        return <String>['Male', 'Female'].map((String value) {
-          return PopupMenuItem<String>(
-            value: value,
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 20),
-            ),
-          );
-        }).toList();
-      },
-      onSelected: (String? newValue) {
-        setState(() {
-          dropdownValue = newValue!;
-        });
-      },
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1, color: Colors.black),
-        // Set the shape here
-        borderRadius: BorderRadius.circular(10),
-      ),
-      constraints: BoxConstraints.expand(width: width - 40, height: 120),
-      padding: const EdgeInsets.all(50),
-
-      child: Container(
+    return Container(
+      height: 60,
+      alignment: Alignment.center,
+      child: PopupMenuButton<String>(
+        itemBuilder: (BuildContext context) {
+          return <String>['Male', 'Female'].map((String value) {
+            return PopupMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: TextStyle(fontSize: 20),
+              ),
+            );
+          }).toList();
+        },
+        onSelected: (String? newValue) {
+          setState(() {
+            dropdownValue = newValue!;
+          });
+        },
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(width: 1, color: Colors.black),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        constraints: BoxConstraints.expand(width: width - 40, height: 120),
+        padding: const EdgeInsets.all(50),
+        child: Container(
           height: 60,
-          // width: MediaQuery.of(context).size.width - 20,
           decoration: BoxDecoration(
               color: Colors.black12,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: Colors.black, width: 1)),
           padding: const EdgeInsets.all(10),
           alignment: Alignment.center,
-          child: Expanded(
-              child: Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                dropdownValue,
+                dropdownValue, // Use the updated value here
                 style: const TextStyle(
                   fontSize: 20,
                 ),
               ),
-              const Icon(Icons.arrow_drop_down)
+              Icon(Icons.arrow_drop_down)
             ],
-          ))), // Set the width and height here
+          ),
+        ),
+      ),
     );
   }
 }
