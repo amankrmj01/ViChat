@@ -6,21 +6,57 @@ import 'package:messenger_app/services/chat/chat_bubble.dart';
 import 'package:messenger_app/services/chat/chat_services.dart';
 import 'package:intl/intl.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   final String receivedEmail;
   final String receiverId;
-  ChatPage({super.key, required this.receivedEmail, required this.receiverId});
+  const ChatPage({super.key, required this.receivedEmail, required this.receiverId});
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  FocusNode focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    focusNode.addListener(() {
+      if(focusNode.hasFocus)
+        {
+          Future.delayed(const Duration(milliseconds: 500),()=> scrollDown(),);
+        }
+    });
+    Future.delayed(const Duration(milliseconds: 100),()=> scrollDown(),);
+
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _messageController.dispose();
+    focusNode.dispose();
+  }
+
+  final ScrollController scrollController = ScrollController();
+
+  void scrollDown(){
+    scrollController.animateTo(scrollController.position.maxScrollExtent, duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+  }
 
   final TextEditingController _messageController = TextEditingController();
+
   final ChatServices _chatServices = ChatServices();
+
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
       await _chatServices.sendMessage(
-          receiverId, _messageController.text.toString());
+          widget.receiverId, _messageController.text.toString());
       _messageController.clear();
     }
+    scrollDown();
   }
 
   String formatTimestamp(Timestamp timestamp) {
@@ -55,7 +91,7 @@ class ChatPage extends StatelessWidget {
           ),
         ),
         title: Text(
-          receivedEmail,
+          widget.receivedEmail,
           style: const TextStyle(fontSize: 24),
         ),
         systemOverlayStyle: SystemUiOverlayStyle(
@@ -67,7 +103,9 @@ class ChatPage extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              // padding: EdgeInsets.only(top: 2),
+              width: double.infinity,
+              margin: const EdgeInsets.only(top:8),
+              padding: const EdgeInsets.only(top: 2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.grey.withOpacity(0.3),
@@ -84,7 +122,7 @@ class ChatPage extends StatelessWidget {
   Widget _buildMessageList() {
     String senderID = _firebaseAuth.currentUser!.uid;
     return StreamBuilder(
-      stream: _chatServices.getMessage(receiverId, senderID),
+      stream: _chatServices.getMessage(widget.receiverId, senderID),
       builder: (builder, snapshot) {
         if (snapshot.hasError) {
           return const Text('Error');
@@ -93,6 +131,7 @@ class ChatPage extends StatelessWidget {
           return const Text('Loading..');
         }
         return ListView(
+          controller: scrollController,
           children: snapshot.data!.docs.map((doc) {
             return _buildMessageItem(doc);
           }).toList(),
@@ -102,53 +141,51 @@ class ChatPage extends StatelessWidget {
   }
 
   Widget _buildMessageItem(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    bool currentUser = data['senderID'] == _firebaseAuth.currentUser!.uid;
-    var alignment = currentUser ? Alignment.centerRight : Alignment.centerLeft;
+  Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  bool currentUser = data['senderID'] == _firebaseAuth.currentUser!.uid;
+  var alignment = currentUser ? Alignment.centerRight : Alignment.centerLeft;
 
-    return Container(
-      // alignment: alignment,
-
-      // constraints: const BoxConstraints(minHeight: 60, minWidth: 50),
-      // padding: const EdgeInsets.all(8),
-      // margin: const EdgeInsets.only(bottom: 5, top: 3, right: 5, left: 5),
-      // decoration: BoxDecoration(
-      //   borderRadius: BorderRadius.circular(20),
-      //   color: Colors.amber,
-      // ),
-      // color: Colors.blue.withOpacity(0.2),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment:
-            currentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ChatBubble(message: data['message'], isCurrentUser: currentUser),
-          Container(
-              margin: EdgeInsets.zero,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Text(formatTimestamp(data['timestamp']))),
-        ],
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        alignment: alignment,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment:
+              currentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ChatBubble(message: data['message'], isCurrentUser: currentUser),
+            Container(
+                margin: EdgeInsets.zero,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(formatTimestamp(data['timestamp']))),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _userInput() {
     return Row(
       children: [
         Expanded(
           child: TextField(
-            onTapOutside: (event) {
-              FocusManager.instance.primaryFocus!.unfocus();
-            },
+            focusNode: focusNode,
+            // onTapOutside: (event) {
+            //   FocusManager.instance.primaryFocus!.unfocus();
+            // },
             controller: _messageController,
             decoration: InputDecoration(
-                hintText: 'Enter Message',
+                hintText: 'Type a Message',
                 filled: true,
                 fillColor: Colors.white,
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide(color: Colors.amber)),
+                    borderSide: const BorderSide(color: Colors.amber)),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                 )),

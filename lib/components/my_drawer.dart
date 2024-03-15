@@ -25,6 +25,7 @@ class DrawerC extends StatelessWidget {
         const Text('Settings'),
         Icons.settings,
         () {
+          Navigator.pop(context);
           Navigator.push(
               context, MaterialPageRoute(builder: (builder) => Settings()));
         }
@@ -49,7 +50,9 @@ class DrawerC extends StatelessWidget {
                   MyLogo(
                     size: 0,
                   ),
-                  SizedBox(width: 15,),
+                  SizedBox(
+                    width: 15,
+                  ),
                   Text(
                     'Menu',
                     style: TextStyle(fontSize: 30),
@@ -57,10 +60,14 @@ class DrawerC extends StatelessWidget {
                 ],
               ),
             ),
-            Divider(thickness: 1,height: 0,color: Color.lerp(Colors.amber, Colors.black, 0.2),),
+            Divider(
+              thickness: 1,
+              height: 0,
+              color: Color.lerp(Colors.amber, Colors.black, 0.2),
+            ),
             Expanded(
               child: ListView.builder(
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   itemCount: items.length,
                   itemBuilder: (BuildContext context, int index) {
                     return ListTile(

@@ -5,13 +5,15 @@ class MyTextField extends StatefulWidget {
   final Icon icon;
   final TextEditingController controller;
   final bool visible;
+  final FocusNode? focusNode;
 
   const MyTextField(
       {super.key,
       required this.text,
       required this.icon,
       required this.controller,
-      required this.visible});
+      required this.visible,
+      this.focusNode});
 
   @override
   _MyTextFieldState createState() => _MyTextFieldState();
@@ -36,6 +38,7 @@ class _MyTextFieldState extends State<MyTextField> {
   Widget build(BuildContext context) {
     return Form(
       child: TextFormField(
+        focusNode: widget.focusNode,
         onTapOutside: (event) {
           FocusManager.instance.primaryFocus?.unfocus();
         },

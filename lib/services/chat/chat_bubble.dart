@@ -13,9 +13,8 @@ class _ChatBubbleState extends State<ChatBubble> {
   @override
   Widget build(BuildContext context) {
     return Container(
-
       padding: const EdgeInsets.all(8),
-      margin: const EdgeInsets.only(bottom: 0, top:5, right: 5, left: 5),
+      margin: const EdgeInsets.only(bottom: 0, top:0, right: 5, left: 5),
       // alignment: Alignment.center,
       constraints: const BoxConstraints(minHeight: 40,minWidth:40),
       decoration: BoxDecoration(
