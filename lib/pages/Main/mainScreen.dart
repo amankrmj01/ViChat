@@ -90,6 +90,7 @@ class _MainScreenState extends State<MainScreen> {
               MaterialPageRoute(
                   builder: (builder) => ChatPage(
                         receivedEmail: userData['email'],
+                    receiverId: userData['uid'],
                       )));
         },
       );
