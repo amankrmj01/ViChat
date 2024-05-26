@@ -22,9 +22,9 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: DrawerC(),
+      drawer: const DrawerC(),
       appBar: AppBar(
-        actions: [],
+        actions: const [],
         flexibleSpace: Container(
           decoration: BoxDecoration(
             boxShadow: [
@@ -52,8 +52,8 @@ class _MainScreenState extends State<MainScreen> {
                 Color.lerp(Colors.white, Colors.black, 0.4)),
       ),
       body: Container(
-          margin: EdgeInsets.only(top: 5, left: 3, right: 3),
-          padding: EdgeInsets.symmetric(horizontal: 3),
+          margin: const EdgeInsets.only(top: 5, left: 3, right: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 3),
           height: double.infinity,
           width: double.infinity,
           decoration: BoxDecoration(
@@ -90,7 +90,7 @@ class _MainScreenState extends State<MainScreen> {
               MaterialPageRoute(
                   builder: (builder) => ChatPage(
                         receivedEmail: userData['email'],
-                    receiverId: userData['uid'],
+                        receiverId: userData['uid'],
                       )));
         },
       );
