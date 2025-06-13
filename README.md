@@ -14,9 +14,6 @@ To begin using ViChat, simply download the app, sign up, and you're ready to con
 - Initial release with core messaging functionality.
 
 ## Screenshots
-Insert your app screenshots here to showcase the app's interface and features.
 
-!ViChat Screenshot 1
-!ViChat Screenshot 2
 
 We're excited for you to try ViChat and look forward to your valuable feedback as we continue to improve and expand our app's capabilities.
